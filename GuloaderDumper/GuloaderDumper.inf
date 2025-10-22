@@ -1,0 +1,63 @@
+;
+; GuloaderDumper.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = GuloaderDumper.cat
+DriverVer   = 06/27/2025,1.0.0.0
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+GuloaderDumper.sys = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%GuloaderDumper.DeviceDesc% = GuloaderDumper_Device, Root\GuloaderDumper ; TODO: edit hw-id
+
+[GuloaderDumper_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+GuloaderDumper.sys
+
+;-------------- Service installation
+[GuloaderDumper_Device.NT.Services]
+AddService = GuloaderDumper,%SPSVCINST_ASSOCSERVICE%, GuloaderDumper_Service_Inst
+
+[Minifilter_AddReg]
+HKR, "Parameters\Instances", "DefaultInstance", 0x00000000, "GuloaderDumper Instance"
+HKR, "Parameters\Instances\GuloaderDumper Instance", "Altitude", 0x00000000, "370030"
+HKR, "Parameters\Instances\GuloaderDumper Instance", "Flags", 0x00010001, 0
+
+; -------------- GuloaderDumper driver install sections
+[GuloaderDumper_Service_Inst]
+DisplayName    = %GuloaderDumper.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\GuloaderDumper.sys
+LoadOrderGroup = FSFilter Activity Monitor
+AddReg         = Minifilter_AddReg
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "ilikepie"
+DiskName = "ilikepie Installation Disk"
+GuloaderDumper.DeviceDesc = "ilikepie Device"
+GuloaderDumper.SVCDESC = "ilikepie Service"
