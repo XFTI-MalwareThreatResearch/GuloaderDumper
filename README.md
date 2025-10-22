@@ -1,7 +1,7 @@
 # GuloaderDumper
 Windows Kernel Driver for dumping guloader payloads automatically
 
-WARNING: When used properly, this project will execute a guloader sample on a victim computer.  Guloader is malware.  The payload it delivers will be malicious.  The computer must be connected to the internet in order for the tool to work.  We highly recommend you do so in a secure, isolated environment that is non attributable to the user.
+WARNING: When used properly, this project will execute a guloader sample on a victim computer.  Guloader is malware.  The payload it delivers will be malicious.  The computer must be connected to the internet in order for the tool to work.  We highly recommend you do so in a secure, isolated environment that is non attributable to the user.  Use only as intended and be careful.
 
 
 GuloaderDumper is a Windows Kernel Module that can be utilized to automatically dump payloads from the Guloader commodity loader.
