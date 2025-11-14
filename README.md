@@ -16,12 +16,18 @@ Because GuloaderDumper resides in the kernel, it avoids almost all of the anti d
 How to Use:
 NOTE: It is highly recommended to use a clean VM on an isolated network that cannot be traced back to you.  The network should be isolated from any other devices.  Again, this program will execute malware.  It will contact malicious domains.  Be careful.
 
+NOTE: If GuloaderDumper is already installed, you will need to remove it.
+1. Navigate to the install path for devcon.exe
+2. Execute devcon remove <identifier> (e.x Root\GuloaderDumper)
+3. Restart the computer.
+
 1. Enable test mode on the victim VM through the following command: bcdedit /set testsigning on
     Because this is a kernel module, test signing must be on because it is not signed with a valid certificate.
 2. Follow the steps here to download and install the Windows Driver Kit: https://learn.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk
     This is required in order to properly insert the kernel module.
 3. Compile GuloaderDumper for your target system.  Visual Studio can be used to do this.  The output should be a folder that contains a few artifacts: a .cat file, a .sys file (the driver itself) and a .inf file.  All are required in order to properly insert.
 4. Install GuloaderDumper using devcon install.  devcon is installed when the WDK is installed.  It is usually located somewhere within the path C:\Program Files (x86)\Windows Kits\10\Tools\<version number>\x64\devcon.exe .  An identifier (can be anything valid, e.x Root\GuloaderDumper) and the path of the .inf file generated during compilation is required.  There should not be any errors on devcon install.
+Example install command: devcon install C:\Users\test\Desktop\GuloaderDumper\GuloaderDumper.inf Root\GuloaderDumper
 5. Place the python file runner.py somewhere on the system.  Doesnt particularly matter where.
 6. Place the guloader sample at the hardcoded path "exe_path" within runner.py.
 7. Before executing, it may be a good idea to double check C:\logfile.txt in order to ensure GuloaderDumper has not reported any errors.  Sometimes when you restart the computer GuloaderDumper will initialize improperly and report an error due to the order of how Windows loads various components.  In order to fix this, simply restart the GuloaderDumper service and check the logfile again.

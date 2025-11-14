@@ -41,6 +41,7 @@ NTKERNELAPI NTSTATUS PsSuspendProcess(PEPROCESS Process);
 HANDLE targetProcess = 0;
 LONG amtProcesses = 0;
 HANDLE currentProcess = 0;
+HANDLE previousProcess = 0;
 HANDLE logFileHandle = NULL;
 HANDLE g_EngineHandle = NULL;
 
@@ -292,8 +293,9 @@ VOID OnProcessNotifyEx(
             if (parentPid == targetProcess)
             {
                 DbgPrint("swapping to secondary process %lld\n", (UINT64)ProcessId);
-                _snwprintf(buffer, 259, L"swapping from %lld to %lld\n", (UINT64)targetProcess, (UINT64)ProcessId);
+                _snwprintf(buffer, 259, L"swapping from %lld to %lld 1\n", (UINT64)targetProcess, (UINT64)ProcessId);
                 WriteStringToLogFileSafe(buffer);
+                previousProcess = targetProcess;
                 currentProcess = ProcessId;
                 amtProcesses++;
             }
@@ -303,14 +305,26 @@ VOID OnProcessNotifyEx(
             if (parentPid == currentProcess) //This is another case to handle for process swaps - if the secondary process creates a child process.
             {
                 DbgPrint("Swapping to secondary process 2 %lld\n", (UINT64)ProcessId);
-                _snwprintf(buffer, 259, L"swapping from %lld to %lld\n", (UINT64)currentProcess, (UINT64)ProcessId);
+                _snwprintf(buffer, 259, L"swapping from %lld to %lld 2\n", (UINT64)currentProcess, (UINT64)ProcessId);
                 WriteStringToLogFileSafe(buffer);
+                previousProcess = currentProcess;
                 currentProcess = ProcessId;
                 amtProcesses++;
             }
         }
         //Through this function we can keep track of which process number guloader will attempt to inject itself into.
 
+    }
+    else
+    {
+        if (ProcessId == currentProcess)
+        {
+            DbgPrint("Swapping to previous process 1 %lld\n", (UINT64)ProcessId);
+            _snwprintf(buffer, 259, L"swapping from previous process %lld to %lld 1\n", (UINT64)currentProcess, (UINT64)previousProcess);
+            WriteStringToLogFileSafe(buffer);
+            //were terminating the current process.  To be safe, backtrack to the previous process.  Its probable weve been duped.
+            currentProcess = previousProcess;
+        }
     }
 }
 
